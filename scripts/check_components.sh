@@ -58,6 +58,7 @@ done
 if [[ ${FINAL_COMPONENT_LIST[*]} ]]; then
     echo "Installing components ${FINAL_COMPONENT_LIST[*]}";
     #$GCLOUD_PATH components install "${FINAL_COMPONENT_LIST[@]}" --quiet
+    whereis sudo
     sudo apt-get install kubectl google-cloud-sdk-kpt
 else
     echo "All components ${PROPOSED_COMPONENTS_TO_INSTALL[*]} already installed."
