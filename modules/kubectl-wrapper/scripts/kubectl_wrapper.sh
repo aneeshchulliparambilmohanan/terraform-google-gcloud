@@ -53,7 +53,7 @@ else
 
     LOCATION_TYPE=$(grep -o "-" <<< "${LOCATION}" | wc -l)
     
-    which kubectl
+    whereis kubectl
     echo $PATH
 
 
