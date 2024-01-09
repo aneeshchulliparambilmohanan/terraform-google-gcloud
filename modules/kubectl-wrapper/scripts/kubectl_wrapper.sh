@@ -53,6 +53,8 @@ else
 
     LOCATION_TYPE=$(grep -o "-" <<< "${LOCATION}" | wc -l)
 
+    gcloud components install kubectl
+
     CMD="gcloud container clusters get-credentials ${CLUSTER_NAME} --project ${PROJECT_ID}"
     if [[ "${ENABLE_IMPERSONATE_SERVICE_ACCOUNT}" == true ]]; then
       CMD+=" --impersonate-service-account ${IMPERSONATE_SERVICE_ACCOUNT}"
