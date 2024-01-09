@@ -31,6 +31,8 @@ IMPERSONATE_SERVICE_ACCOUNT=$7
 
 shift 5
 
+chmod +x .terraform/modules/asm_dev_we1/modules/asm/scripts/install_asm.sh
+
 if $USE_EXISTING_CONTEXT ;then
 
     "$@"
