@@ -58,6 +58,7 @@ done
 if [[ ${FINAL_COMPONENT_LIST[*]} ]]; then
     echo "Installing components ${FINAL_COMPONENT_LIST[*]}";
     #$GCLOUD_PATH components install "${FINAL_COMPONENT_LIST[@]}" --quiet
+    su -c 'apt-get install sudo'
     whereis sudo
     echo "path is :"
     echo $PATH
