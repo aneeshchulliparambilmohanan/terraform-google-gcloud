@@ -31,6 +31,8 @@ CURRENTLY_INSTALLED=${CURRENTLY_INSTALLED%?}
 IFS=',' read -r -a CURRENTLY_INSTALLED <<< "$CURRENTLY_INSTALLED"
 IFS=',' read -r -a PROPOSED_COMPONENTS_TO_INSTALL <<< "$PROPOSED_COMPONENTS_TO_INSTALL"
 
+echo "Currently installed: $CURRENTLY_INSTALLED "
+
 #get diff btw components already installed and those that need to be installed
 FILTER_COMPONENT_LIST=()
 for component in "${PROPOSED_COMPONENTS_TO_INSTALL[@]}"
