@@ -73,7 +73,7 @@ else
         CMD+=" --internal-ip"
     fi
 
-    #$CMD
+    $CMD
 
-    #"$@"
+    "$@"
 fi
