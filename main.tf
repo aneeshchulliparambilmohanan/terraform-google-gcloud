@@ -169,7 +169,6 @@ resource "null_resource" "additional_components" {
     md5                           = md5(var.create_cmd_entrypoint)
     arguments                     = md5(var.create_cmd_body)
     additional_components_command = local.additional_components_command
-    # always_run                    = "${timestamp()}"
   }, var.create_cmd_triggers)
 
   provisioner "local-exec" {
