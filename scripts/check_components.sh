@@ -59,12 +59,28 @@ done
 # if there is any component left in list, install via gcloud
 if [[ ${FINAL_COMPONENT_LIST[*]} ]]; then
     echo "Installing components ${FINAL_COMPONENT_LIST[*]}";
-    $GCLOUD_PATH components install "${FINAL_COMPONENT_LIST[@]}" --quiet
+    #$GCLOUD_PATH components install "${FINAL_COMPONENT_LIST[@]}" --quiet
     # su -c 'apt-get install sudo'
     # whereis sudo
     # echo "path is :"
     # echo $PATH
     # sudo apt-get install kubectl google-cloud-sdk-kpt
+    apt-get update
+    apt-get install -y apt-transport-https ca-certificates curl gnupg
+    mkdir -p -m 755 /etc/apt/keyrings
+    curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+    chmod 644 /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+    echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list
+    chmod 644 /etc/apt/sources.list.d/kubernetes.list
+    apt-get update
+    apt-get install -y kubectl
+
+    echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+    apt-get update
+    apt-get install -y google-cloud-sdk-kpt
+    #apt-get install -y google-cloud-sdk-gke-gcloud-auth-plugin
+    #apt-get install -y jq
 else
     echo "All components ${PROPOSED_COMPONENTS_TO_INSTALL[*]} already installed."
 fi
