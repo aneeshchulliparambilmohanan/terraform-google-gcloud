@@ -59,12 +59,12 @@ done
 # if there is any component left in list, install via gcloud
 if [[ ${FINAL_COMPONENT_LIST[*]} ]]; then
     echo "Installing components ${FINAL_COMPONENT_LIST[*]}";
-    #$GCLOUD_PATH components install "${FINAL_COMPONENT_LIST[@]}" --quiet
-    su -c 'apt-get install sudo'
-    whereis sudo
-    echo "path is :"
-    echo $PATH
-    sudo apt-get install kubectl google-cloud-sdk-kpt
+    $GCLOUD_PATH components install "${FINAL_COMPONENT_LIST[@]}" --quiet
+    # su -c 'apt-get install sudo'
+    # whereis sudo
+    # echo "path is :"
+    # echo $PATH
+    # sudo apt-get install kubectl google-cloud-sdk-kpt
 else
     echo "All components ${PROPOSED_COMPONENTS_TO_INSTALL[*]} already installed."
 fi
