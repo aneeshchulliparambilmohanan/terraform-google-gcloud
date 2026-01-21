@@ -58,29 +58,62 @@ done
 
 # if there is any component left in list, install via gcloud
 if [[ ${FINAL_COMPONENT_LIST[*]} ]]; then
-    echo "Installing components ${FINAL_COMPONENT_LIST[*]}";
-    #$GCLOUD_PATH components install "${FINAL_COMPONENT_LIST[@]}" --quiet
-    # su -c 'apt-get install sudo'
-    # whereis sudo
-    # echo "path is :"
-    # echo $PATH
-    # sudo apt-get install kubectl google-cloud-sdk-kpt
-    apt-get update
-    apt-get install -y apt-transport-https ca-certificates curl gnupg
-    mkdir -p -m 755 /etc/apt/keyrings
-    curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-    chmod 644 /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-    echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list
-    chmod 644 /etc/apt/sources.list.d/kubernetes.list
-    apt-get update
-    apt-get install -y kubectl
+    echo "Installing components ${FINAL_COMPONENT_LIST[*]}"
 
-    echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
-    apt-get update
-    apt-get install -y google-cloud-sdk-kpt
-    #apt-get install -y google-cloud-sdk-gke-gcloud-auth-plugin
-    #apt-get install -y jq
+    su -c '
+        set -e
+
+        echo "Backing up existing APT sources..."
+        cp /etc/apt/sources.list /etc/apt/sources.list.bak
+
+        if [ -d /etc/apt/sources.list.d ]; then
+            mkdir -p /etc/apt/sources.list.d.bak
+            cp -r /etc/apt/sources.list.d/* /etc/apt/sources.list.d.bak/ 2>/dev/null || true
+        fi
+
+        echo "Switching to Debian archive repositories (temporary)..."
+        cat > /etc/apt/sources.list <<EOF
+deb http://archive.debian.org/debian buster main contrib non-free
+deb http://archive.debian.org/debian-security buster/updates main
+EOF
+
+        echo "Disabling APT release expiry checks..."
+        echo "Acquire::Check-Valid-Until \"false\";" > /etc/apt/apt.conf.d/99no-check-valid
+
+        echo "Updating package lists..."
+        apt-get update
+
+        echo "Installing sudo..."
+        apt-get install -y sudo
+    '
+
+    echo "Verifying sudo installation..."
+    whereis sudo
+
+    echo "PATH is:"
+    echo "$PATH"
+
+    echo "Installing ASM required tools..."
+    sudo apt-get update
+    sudo apt-get install -y kubectl google-cloud-sdk-kpt
+
+    su -c '
+        set -e
+
+        echo "Restoring original APT sources..."
+        mv /etc/apt/sources.list.bak /etc/apt/sources.list
+
+        if [ -d /etc/apt/sources.list.d.bak ]; then
+            rm -rf /etc/apt/sources.list.d
+            mv /etc/apt/sources.list.d.bak /etc/apt/sources.list.d
+        fi
+
+        echo "Removing temporary APT override..."
+        rm -f /etc/apt/apt.conf.d/99no-check-valid
+
+        echo "APT sources restored successfully."
+    '
+
 else
     echo "All components ${PROPOSED_COMPONENTS_TO_INSTALL[*]} already installed."
 fi
