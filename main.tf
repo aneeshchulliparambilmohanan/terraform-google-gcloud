@@ -162,7 +162,8 @@ resource "null_resource" "upgrade" {
 }
 
 resource "null_resource" "additional_components" {
-  count      = var.enabled && length(var.additional_components) > 0 ? 1 : 0
+  #count      = var.enabled && length(var.additional_components) > 0 ? 1 : 0
+  count      = 0
   depends_on = [null_resource.decompress, null_resource.upgrade]
 
   triggers = merge({
@@ -216,8 +217,8 @@ resource "null_resource" "gcloud_auth_google_credentials" {
 }
 
 resource "null_resource" "run_command" {
+  #count = var.enabled ? 1 : 0
   count = 0
-
   depends_on = [
     null_resource.module_depends_on,
     null_resource.decompress,
