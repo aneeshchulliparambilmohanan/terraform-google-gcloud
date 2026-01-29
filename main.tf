@@ -175,6 +175,12 @@ resource "null_resource" "additional_components" {
     when    = create
     command = self.triggers.additional_components_command
   }
+
+  lifecycle {
+    ignore_changes = [ 
+      triggers["additional_components_command"]
+    ]
+  }
 }
 
 resource "null_resource" "gcloud_auth_service_account_key_file" {
@@ -209,34 +215,34 @@ resource "null_resource" "gcloud_auth_google_credentials" {
   }
 }
 
-resource "null_resource" "run_command" {
-  count = var.enabled ? 1 : 0
+# resource "null_resource" "run_command" {
+#   count = var.enabled ? 1 : 0
 
-  depends_on = [
-    null_resource.module_depends_on,
-    null_resource.decompress,
-    null_resource.additional_components,
-    null_resource.gcloud_auth_google_credentials,
-    null_resource.gcloud_auth_service_account_key_file
-  ]
+#   depends_on = [
+#     null_resource.module_depends_on,
+#     null_resource.decompress,
+#     null_resource.additional_components,
+#     null_resource.gcloud_auth_google_credentials,
+#     null_resource.gcloud_auth_service_account_key_file
+#   ]
 
-  triggers = merge({
-    md5                   = md5(var.create_cmd_entrypoint)
-    arguments             = md5(var.create_cmd_body)
-    create_cmd_entrypoint = var.create_cmd_entrypoint
-    create_cmd_body       = var.create_cmd_body
-    gcloud_bin_abs_path   = local.gcloud_bin_abs_path
-  }, var.create_cmd_triggers)
+#   triggers = merge({
+#     md5                   = md5(var.create_cmd_entrypoint)
+#     arguments             = md5(var.create_cmd_body)
+#     create_cmd_entrypoint = var.create_cmd_entrypoint
+#     create_cmd_body       = var.create_cmd_body
+#     gcloud_bin_abs_path   = local.gcloud_bin_abs_path
+#   }, var.create_cmd_triggers)
 
-  provisioner "local-exec" {
-    when    = create
-    command = <<-EOT
-    PATH=${self.triggers.gcloud_bin_abs_path}:$PATH
-    ${self.triggers.create_cmd_entrypoint} ${self.triggers.create_cmd_body}
-    EOT
-  }
+#   provisioner "local-exec" {
+#     when    = create
+#     command = <<-EOT
+#     PATH=${self.triggers.gcloud_bin_abs_path}:$PATH
+#     ${self.triggers.create_cmd_entrypoint} ${self.triggers.create_cmd_body}
+#     EOT
+#   }
 
-}
+# }
 
 resource "null_resource" "run_destroy_command" {
   count = var.enabled ? 1 : 0
