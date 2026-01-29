@@ -216,7 +216,7 @@ resource "null_resource" "gcloud_auth_google_credentials" {
 }
 
 resource "null_resource" "run_command" {
-  count = var.enabled ? 1 : 0
+  count = 0
 
   depends_on = [
     null_resource.module_depends_on,
